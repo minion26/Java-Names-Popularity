@@ -1,1 +1,12 @@
 # Java-Names-Popularity
+## Java Class Names Popularity
+
+1. First, using the GitHub, I generated a token for using the GitHub API with much more requests per hour.
+2. In ``get_repos.py`` I created a function called **get_java_repos** that makes requests to *https://api.github.com/search/repositories?q=language:Java&sort=stars&order=desc&page={page}&per_page=30*. The GitHub API restricts the number of results returned for a search query to 1000 items. These requests had to be executed with a cool time so because of that I calculate the sleep time based on the header from the response **X-RateLimit-Reset**. With all the repos found, I save them to a file named `java_repos.txt` saving only the name of the repo, found in the JSON called **full_name**.
+3. In ``get_files_from_repo.py``, as the name suggests, I retrieve the names of the files using the request *https://api.github.com/repos/{repo_name}/contents*, making sure I calculate the cool off time as well. The JSON return from this request can be a directory or file. If it is a Java file, I save it to a list , otherwise parsing the directory and saving the names of the Java files, all of these names are saved in `java_files_from_repo2.txt`. The number of files found only in 7 repos from 1020 are 16202.
+4. In ``slice_names.py`` I simply just slice the path toto have only the name, without the extension or the directory is it from. All the sliced names are saved in `sliced_name_from_repo2.txt`.
+5. For calculating the popularity, using regex I sliced the named into words, counting the frequency, and saving it to ``word_popularity_ranking2.txt`` in ascending order.  
+
+For viewing the data better, using python and machine learning, I used K-Means on the collected data. Using chunks of 500 names, I applied K-Means only to calculate the SSE (Sum of squared errors), and finding the elbow points for each chunk. This point is used to determine the optimal number of clusters (K). For each chunk I plotted the graph, then manually analyzed it and writing in ``elbow-points.txt``. Then, in `kmeans.py`, I process each chunk, read from the file the optimal K, and plotting the graph for a better visualization.
+
+Because K-Means works only with a data set of numbers, not words, each file name was broke into words, and then applied TD-IDF (term frequency - inverse document frequency). In this way, the K-Means algorithm can calculate and compare the distances between data entries. If a token (word) appears multiple times, then is common, so the IDF values is going to be smaller.
